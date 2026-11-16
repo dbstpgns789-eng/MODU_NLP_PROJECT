@@ -1095,4 +1095,66 @@ p ≥ 0.5         → 차단
 
 ## 6. 재현 방법
 
-(작성 예정)
+### 6.1 구조: 판정 단계와 분석 단계
+
+모든 실험은 두 단계로 나뉜다.
+
+| 단계 | 스크립트 | 하는 일 | API 키 |
+| --- | --- | --- | --- |
+| 판정 | `experiments/run_api.py <실험>` 또는 `experiments/run_<실험>.py` | 문서를 Jev에 보내 p를 받고, 원본 응답을 `results/<실험>/raw/`에 저장한 뒤 문서별 예측표(`Q2_predictions.csv`, `QL_predictions.csv`)와 `summary.json`을 만든다 | 필요 |
+| 분석 | `experiments/analyze_<실험>.py` | 저장된 예측표와 원본 응답에서 표(`tables/`), 그림(`figures/`), `summary.json`의 `analysis`를 다시 만든다 | **필요 없음** |
+
+원본 응답이 모두 레포에 저장되어 있으므로, **API 키 없이도 분석 단계를 다시 돌려 이 보고서의 모든 표와 그림을 다시 만들 수 있다.** 판정 단계도 `raw/`에 이미 있는 호출은 건너뛰므로, 다시 돌려도 새로 호출하지 않는다.
+
+### 6.2 준비
+
+```bash
+git clone https://github.com/hwang-ye-song/MODU_NLP_PROJECT
+cd MODU_NLP_PROJECT
+pip install -r requirements.txt matplotlib scipy scikit-learn
+
+# 판정 단계를 새로 돌릴 때만 필요. 키는 코드, 노트북 출력, 커밋에 넣지 않는다.
+export TYPESAFE_API_KEY=...            # Windows PowerShell: $env:TYPESAFE_API_KEY="..."
+```
+
+Windows 콘솔에서 한글이 깨지면 `python -X utf8 ...`으로 실행한다.
+
+### 6.3 실험별 명령
+
+| 보고서 절 | 실험 | 판정 (API) | 분석 (API 없음) |
+| --- | --- | --- | --- |
+| 3.1 | 기준선 | `python experiments/run_api.py 01_baseline` | `python experiments/analyze_01_baseline.py` |
+| 3.1 | 질문 5개 비교 | `python experiments/run_api.py 01_baseline_definitions` | `python experiments/analyze_01_baseline_definitions.py` |
+| 3.2 | 길이 | `python experiments/build_04_length.py` (입력 생성) → `python experiments/run_04_length.py` | `python experiments/analyze_04_length.py` |
+| 3.3 | 한국어 | `python experiments/run_api.py 02_korean` → `python experiments/translate_ko.py` (번역, torch 필요) → `python experiments/run_api.py 02_korean_mt` | `python experiments/analyze_02_korean.py` |
+| 3.4 | 한국어 말투 | `python experiments/fetch_korean_registers.py` → `python experiments/run_02b_korean_registers.py judge` → `python experiments/translate_registers.py` → `python experiments/run_02b_korean_registers.py judge-mt` | `python experiments/analyze_02b_korean_registers.py` |
+| 3.5 | 지시 어조 | `python experiments/run_api.py X1_register` | `python experiments/analyze_X1_register.py` |
+| 3.6 | 설득 문구 | `python experiments/run_api.py X4_persuasion` | `python experiments/analyze_X4_persuasion.py` |
+| 3.7 | 실제 대회 공격 | `python experiments/run_api.py 03_judge_attack` | `python experiments/analyze_03_judge_attack.py` |
+| 3.7 | 점수 피드백 탐색 | `python experiments/run_F4_adaptive.py` | `python experiments/analyze_F4_adaptive.py` |
+| 3.8 | 사용자 과제 | `python experiments/run_api.py X2_user_task` | `python experiments/analyze_X2_user_task.py` |
+| 3.8 | 주변 글 | `python experiments/run_api.py X3_distractor` | `python experiments/analyze_X3_distractor.py` |
+
+대부분의 강건성 실험은 기준선의 예측을 비교 기준으로 읽으므로, 처음부터 돌린다면 `01_baseline`을 먼저 실행한다. 실험마다 자세한 순서와 소요 시간은 `results/<실험>/README.md`의 "다시 실행" 절에 있다.
+
+**평가셋 다시 만들기**: `data/injection_eval/` 폴더에서 `python -X utf8 -I _build/scripts/merge_v2.py . .`를 실행하면 EN, KO, JA 파일이 같은 내용으로 다시 만들어진다 (md5 일치 확인).
+
+**30초 실행 예시**: Jev를 문서 필터로 쓰는 가장 짧은 예시는 [README](../README.md)의 "30초 실행 예시"에 있다.
+
+### 6.4 재현 확인
+
+보고서를 쓰는 사람(실험을 만들지 않은 팀원)이 2026-11-16에 **레포의 깨끗한 사본**에서 분석 단계를 다시 돌려 저장된 결과와 비교했다.
+
+| 실험 | 결과 |
+| --- | --- |
+| 01_baseline | 오류 없이 완료. 표 43개, 그림 14장 생성 |
+| 03_judge_attack | 오류 없이 완료 |
+| X1_register | 오류 없이 완료 |
+
+| 비교 항목 | 결과 |
+| --- | --- |
+| 그림 | **바이트 단위로 모두 같음** (변경 0개) |
+| TPR, FPR, AUC 등 결과 지표 | **모두 같음** |
+| 차이가 난 부분 | 생성 시각과 커밋 해시(메타데이터), 소수점 열다섯째 자리 이하의 부동소수점 오차, 그리고 01_baseline 비용 표의 QL 비용 한 칸(저장본 0.09, 다시 만든 값 0.0974. 다시 만든 값이 토큰 수 × 단가와 맞음) |
+
+즉 저장된 원본 응답에서 출발하면 **다른 사람이 같은 결과를 다시 얻을 수 있다.** 판정 단계는 API에 seed가 없어 다시 호출하면 p가 조금 달라지지만 (5.1절 #2), 3회 평균을 쓰므로 판정이 뒤집히는 문서는 1~2%다.
