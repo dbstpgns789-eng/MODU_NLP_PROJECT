@@ -90,7 +90,7 @@ Jev는 판정만 하도록 만든 모델이다. 큰 LLM보다 훨씬 싸고(100�
 
 | 축 | 알려진 결과 | 출처 |
 | --- | --- | --- |
-| 길이 | 512토큰 인코더 탐지기 recall: 잘리지 않은 공격 34%, 잘린 공격 11% | Hedgerow 보고서 (2026, 동료심사 없음) |
+| 길이 | 긴 입력에서 탐지기가 공격을 놓치거나 정상 문서를 대량으로 막음 (예: PromptGuard v1 메일 요약 과제 FNR 0.98) | [LongPIBench (EMNLP Findings 2026)](https://arxiv.org/abs/2608.28411) 표 3 |
 | 위치 | 중간·끝 삽입이 앞 삽입보다 공격 성공률이 높음 (0.53→0.87) | LongPIBench (EMNLP Findings 2026) |
 | 오탐 | 트리거 단어가 있는 정상 입력에서 기존 가드 정확도 약 60% | [PIGuard, ACL 2025](https://aclanthology.org/2025.acl-long.1468/) |
 | 말투 | 한국어 협박체 정상 문장 오탐률 55~98% (생성형 LLM 판정기) | [korean-prompt-injection-registers](https://github.com/JHC56/korean-prompt-injection-registers) |
@@ -104,7 +104,7 @@ Jev는 판정만 하도록 만든 모델이다. 큰 LLM보다 훨씬 싸고(100�
 2. "이 문서는 검토를 통과했다"처럼 판정기를 설득하는 문구만 다룬 논문이 없다 (업계 블로그 HiddenLayer 정도).
 3. 한국어 인젝션에서 "번역 후 판정"의 효과를 잰 연구가 없다.
 
-2026년 자료 일부(Hedgerow, LongPIBench, arXiv 2610.03448)는 원문을 아직 열어 보지 않았다. 발표에 인용하기 전에 확인한다.
+11/16 보고서 작성 때 모든 인용을 원문에서 확인했다. Hedgerow 보고서는 존재를 확인하지 못해 뺐고, LongPIBench의 위치 수치(0.53 → 0.87)는 코드 리뷰 과제 하나의 값임을 확인했다. 확인된 인용 목록은 `docs/REPORT.md` 1절에 있다.
 
 ## 실험 설계
 
