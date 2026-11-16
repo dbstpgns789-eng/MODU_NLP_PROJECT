@@ -3,6 +3,7 @@
     python experiments/run_api.py 01_baseline        # EN 1000 + NotInject 25 (reuses baseline/ Q2 calls if present)
     python experiments/run_api.py X1_register        # 450 register variants
     python experiments/run_api.py X2_user_task       # 1000 docs with the user's task: state = {"user_task", "document"}
+    python experiments/run_api.py X5_doc_label       # same 1000 docs, task removed: state = {"document"} (X2 control)
     python experiments/run_api.py X3_distractor      # 400: same span in wiki vs instruction-dense Enron carriers (+ clean carriers)
     python experiments/run_api.py X4_persuasion      # 1200: self-classification phrases inserted at top / next to the span
     python experiments/run_api.py 01_baseline_definitions   # EN 1000 + NotInject with the own-definition questions QS, Q3, QC
@@ -62,6 +63,14 @@ def spec(exp):
     elif exp == "X2_user_task":
         for r in J.load_jsonl(X2):
             items.append({"set": "X2", "uid": r["exp_uid"], "state": {"user_task": r["user_task"], "document": r["text"]}})
+            meta[r["exp_uid"]] = {k: r.get(k) for k in ("label", "base_uid", "base_id", "user_task_source", "source", "subset",
+                                                         "doc_type", "risk_level")}
+            meta[r["exp_uid"]]["label_int"] = label_int(r)
+    elif exp == "X5_doc_label":
+        # Same 1000 X2 documents with the task removed: only the {"document": ...} wrapper stays. Separates the X2 gain
+        # into "task content" vs "document label / JSON wrapper".
+        for r in J.load_jsonl(X2):
+            items.append({"set": "X5", "uid": r["exp_uid"], "state": {"document": r["text"]}})
             meta[r["exp_uid"]] = {k: r.get(k) for k in ("label", "base_uid", "base_id", "user_task_source", "source", "subset",
                                                          "doc_type", "risk_level")}
             meta[r["exp_uid"]]["label_int"] = label_int(r)
