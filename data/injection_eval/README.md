@@ -67,19 +67,22 @@ CSV는 엑셀에서 바로 열 수 있도록 UTF-8 BOM으로 저장했습니다.
 | `char_len` | 글자 수 |
 | `origin` | 원본 위치 (URL, 커밋/리비전, 파일, 행 번호, 공격 카테고리 등) |
 
-## 구성 (EN과 KO 동일)
+## 구성 (EN과 KO 동일, 1,000건)
 
-| 문서 종류 | 주입 | 정상 | 출처 |
+| 문서 종류 | 주입 | 정상 | 출처 (주입 / 정상) |
 |---|---|---|---|
-| 이메일 | 110 | 128 | 주입: BIPIA 이메일 30, LLMail-Inject Phase2 80 / 정상: BIPIA 20, LLMail 오탐 테스트 메일 40, Enron 실제 메일 65 (그중 트리거 단어가 들어간 하드네거티브 25), 합성 3 |
-| 도구 응답(JSON) | 80 | 60 | InjecAgent (dh·ds × base·enhanced, 사용자 도구 17종이 주입과 정상 양쪽에 고르게 분포) |
-| 뉴스 기사(웹) | 40 | 40 | BIPIA 요약 과제 (XSum 기사에 BIPIA 공격을 삽입) |
-| 웹페이지 | 30 | 33 | AgentDojo 5/5, BrowseSafe-Bench(HTML) 25/25, 합성 0/3 |
-| 일반 문서 | 30 | 30 | SEP 벤치마크 |
+| 이메일 | 125 | 146 | LLMail-Inject 89 / 37, BIPIA 21 / 11, AgentDojo 13 / 16, SEP 2 / 1, Enron 0 / 78 (그중 트리거 단어가 들어간 하드네거티브 25), 합성 0 / 3 |
+| 도구 응답(JSON) | 115 | 82 | InjecAgent 80 / 60 (dh·ds × base·enhanced, 사용자 도구 17종이 주입과 정상 양쪽에 고르게 분포), AgentDojo 35 / 22 |
+| 뉴스 기사(웹) | 70 | 70 | BIPIA 요약 과제 (XSum 기사에 BIPIA 공격을 삽입) |
+| 웹페이지 | 70 | 72 | BrowseSafe-Bench(HTML) 65 / 64, AgentDojo 5 / 5, 합성 0 / 3 |
+| 일반 문서 | 60 | 68 | SEP 48 / 49, AgentDojo 12 / 19 |
 | 표 | 30 | 25 | BIPIA |
 | 코드 Q&A | 30 | 25 | BIPIA (Stack Overflow 형식) |
-| 위키·채팅·매뉴얼 | 0 | 9 | 합성 하드네거티브 (트리거 단어를 쓴 사람 간 지시, 보안 교육 문서) |
-| **합계** | **350** | **350** | |
+| 채팅 | 0 | 6 | AgentDojo 0 / 3, 합성 0 / 3 |
+| 위키·매뉴얼 | 0 | 6 | 합성 하드네거티브 (트리거 단어를 쓴 사람 간 지시, 보안 교육 문서) |
+| **합계** | **500** | **500** | |
+
+출처별 합계 (주입 / 정상): BIPIA 151 / 131, LLMail-Inject 89 / 37, InjecAgent 80 / 60, AgentDojo 65 / 65, BrowseSafe-Bench 65 / 64, SEP 50 / 50, Enron 0 / 78, 합성 0 / 15.
 
 **JA 세트**는 다음과 같이 구성했습니다.
 - **주입 250건**: LLMail-Inject Phase2에서 **탐지기 방어가 걸린 레벨에서 탐지를 통과한(undetected) 실제 제출물**입니다. EN에 들어간 LLMail 샘플과는 겹치지 않습니다.
