@@ -66,7 +66,30 @@ pip install -r requirements.txt matplotlib scipy scikit-learn
 python experiments/analyze_01_baseline.py      # API 키 없이 저장된 결과에서 표·그림을 다시 만듦
 ```
 
-원본 API 응답이 `results/*/raw/`에 저장되어 있으므로, **분석 단계는 API 키 없이** 다시 돌릴 수 있습니다. 판정 단계를 새로 돌리려면 환경변수 `TYPESAFE_API_KEY`가 필요합니다 (Colab에서는 Secrets에 저장). 실험별 명령은 [보고서 6절](docs/REPORT.md#6-재현-방법)에 있습니다.
+원본 API 응답이 `results/*/raw/`에 저장되어 있으므로, **분석 단계는 API 키 없이** 다시 돌릴 수 있습니다. 판정 단계를 새로 돌리려면 환경변수 `TYPESAFE_API_KEY`가 필요합니다 (Colab에서는 Secrets에 저장). 키는 코드, 노트북 출력, 커밋에 넣지 않습니다. Windows 콘솔에서 한글이 깨지면 `python -X utf8 ...`으로 실행합니다. 두 단계의 구조와 재현 확인 결과는 [보고서 6절](docs/REPORT.md#6-재현-방법)에 있습니다.
+
+```bash
+export TYPESAFE_API_KEY=...            # Windows PowerShell: $env:TYPESAFE_API_KEY="..."
+```
+
+| 보고서 절 | 실험 | 판정 (API) | 분석 (API 없음) |
+| --- | --- | --- | --- |
+| 3.1 | 기준선 | `python experiments/run_api.py 01_baseline` | `python experiments/analyze_01_baseline.py` |
+| 3.1 | 질문 5개 비교 | `python experiments/run_api.py 01_baseline_definitions` | `python experiments/analyze_01_baseline_definitions.py` |
+| 3.2 | 길이 | `python experiments/build_04_length.py` (입력 생성) → `python experiments/run_04_length.py` | `python experiments/analyze_04_length.py` |
+| 3.3 | 한국어 | `python experiments/run_api.py 02_korean` → `python experiments/translate_ko.py` (번역, torch 필요) → `python experiments/run_api.py 02_korean_mt` | `python experiments/analyze_02_korean.py` |
+| 3.4 | 한국어 말투 | `python experiments/fetch_korean_registers.py` → `python experiments/run_02b_korean_registers.py judge` → `python experiments/translate_registers.py` → `python experiments/run_02b_korean_registers.py judge-mt` | `python experiments/analyze_02b_korean_registers.py` |
+| 3.5 | 지시 어조 | `python experiments/run_api.py X1_register` | `python experiments/analyze_X1_register.py` |
+| 3.6 | 설득 문구 | `python experiments/run_api.py X4_persuasion` | `python experiments/analyze_X4_persuasion.py` |
+| 3.7 | 실제 대회 공격 | `python experiments/run_api.py 03_judge_attack` | `python experiments/analyze_03_judge_attack.py` |
+| 3.7 | 점수 피드백 탐색 | `python experiments/run_F4_adaptive.py` | `python experiments/analyze_F4_adaptive.py` |
+| 3.8 | 사용자 과제 | `python experiments/run_api.py X2_user_task` | `python experiments/analyze_X2_user_task.py` |
+| 3.8 | 주변 글 | `python experiments/run_api.py X3_distractor` | `python experiments/analyze_X3_distractor.py` |
+| 3.8 | 이름표만 (X5) | `python experiments/run_api.py X5_doc_label` | `python experiments/analyze_X5_doc_label.py` |
+
+대부분의 강건성 실험은 기준선의 예측을 비교 기준으로 읽으므로, 처음부터 돌린다면 `01_baseline`을 먼저 실행합니다.
+
+**평가셋 다시 만들기**: `data/injection_eval/` 폴더에서 `python -X utf8 -I _build/scripts/merge_v2.py . .`를 실행하면 EN, KO, JA 파일이 같은 내용으로 다시 만들어집니다 (md5 일치 확인).
 
 ## 작업 규칙
 
